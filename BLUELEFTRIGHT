@@ -1,0 +1,258 @@
+package org.firstinspires.ftc.teamcode;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.ColorSensor;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+
+@Autonomous
+
+public class JANBLUERIGHT extends LinearOpMode {
+ //Autnomous code
+	 
+				private DcMotor frontLeft = null;
+				private DcMotor frontRight = null;
+				private DcMotor backLeft = null;
+				private DcMotor backRight = null;
+				private DistanceSensor distanceSL;
+				private DistanceSensor distanceSR;
+				private CRServo bucketG = null;
+				private DcMotor inTake = null;
+				private DcMotor slide = null;
+   
+		  //  private Servo servoWrist = null;
+   
+				int spikeMark = 0;		   // 1=left 2=center 3=right
+	
+  
+				public void runOpMode() {
+					
+								frontLeft = hardwareMap.get(DcMotor.class, "frontLeft");
+								frontRight = hardwareMap.get(DcMotor.class, "frontRight");
+								backLeft = hardwareMap.get(DcMotor.class, "backLeft");
+								backRight = hardwareMap.get(DcMotor.class, "backRight");
+								
+								distanceSL = hardwareMap.get(DistanceSensor.class, "distanceSL");
+								distanceSR = hardwareMap.get(DistanceSensor.class, "distanceSR");
+								
+								inTake = hardwareMap.get(DcMotor.class, "inTake");
+								bucketG = hardwareMap.get(CRServo.class, "bucketG");
+								slide = hardwareMap.get(DcMotor.class, "slide");
+							 
+								backLeft.setDirection(DcMotor.Direction.REVERSE);
+								frontLeft.setDirection(DcMotor.Direction.REVERSE);
+	
+					   frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+					   frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+					   
+					   frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+					   frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+					   
+					   backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+					   backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+					   
+					   backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+					   backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+								telemetry.addData("Status", "Initialized");
+								telemetry.update();
+								
+								waitForStart();
+							 forwardEncoder(0.5,650);
+								//Program begins after play button
+								// 1) find element
+								// 2) move top element 
+								//3) place pixel 
+								//4) back up
+								//5) park to backstage 
+   
+   strafeEncoder(0.35, 400); 
+  forwardEncoder(-0.3, 900);
+  
+	 sleep(500);
+	if((distanceSL.getDistance(DistanceUnit.INCH)) < 16) {  //not permenent solution													telemetry.addData("Case", "Center");
+													telemetry.update();
+				spikeMark= 2;
+ 
+													// go backwards and drop purple pixel
+	
+   
+  							} else if((distanceSR.getDistance(DistanceUnit.INCH)) < 16){
+												telemetry.addData("Case", "Right");
+												telemetry.update();
+	 
+												//object on center case
+											 
+												 spikeMark=3;
+	 
+		// strafe left, go backwards, and drop purple pixel
+										}else{
+	telemetry.addData("Case", "Left");
+	telemetry.update();
+	  
+		//object on left case
+		
+		 spikeMark=1;
+	   
+		//strafe left, go backwards,turn, forwards, drop purple pixel
+	}
+	 spikeMark=2;
+   
+	
+	// before this finalized 1 26 24 1131am
+	
+	 
+	if(spikeMark == 3) {
+		strafeEncoder(1.0, 1500);
+	  
+		
+		inTake.setPower(-1);
+		sleep(1000);
+		inTake.setPower(0);
+		
+	} else if(spikeMark == 2) {
+	 
+		 // CENTER CASE
+		// step 2
+	   // Go forward
+	  // Drop off pixel
+	 // Go backward
+	// Turn to truss
+	   
+		forwardEncoder(0.5, 2160);
+		sleep(900);
+		forwardEncoder(-0.45, -3000);
+		inTake.setPower(-0.3);
+		sleep(700);
+		inTake.setPower(0);
+		sleep(100);
+		forwardEncoder(0.5, -3000);
+		sleep(500);
+
+	} else if(spikeMark == 1) {
+		turn(-0.5, 570);	//90 degrees
+		forwardEncoder(0.5, 500); 
+		inTake.setPower(-1);
+		sleep(500);
+		inTake.setPower(0);
+		forwardEncoder(0.5,200);
+		sleep(500);
+		turn(0.5, 970); 
+		sleep(200);
+  
+	} else {
+		
+	}
+	 //forwardEncoder(-0.5, -1500);
+	 /*
+	 bucketG.setPower(-1);
+	 inTake.setPower(-1.0);
+	 sleep(3000);
+	 bucketG.setPower(0);
+	 inTake.setPower(0);
+	 */
+	 sleep(100);
+	forwardEncoder(0.2, 153);
+	strafeEncoder(0.5, -9000);
+	inTake.setPower(0.5);	 //auto is working but stoping after 10 seconds of action???
+	 sleep(500);
+	 sleep(1000);
+	
+	}
+	/*
+	public void strafe(double Power, int time){
+	frontLeft.setPower(-Power);	//strafe right
+	frontRight.setPower(Power); 
+	backLeft.setPower(Power);
+	backRight.setPower(-Power);
+	sleep(time);
+	
+	frontLeft.setPower(0);  //stop
+	frontRight.setPower(0); 
+	backLeft.setPower(0);
+	backRight.setPower(0);
+	
+	}
+		public void forward(double Power, int time){
+	frontLeft.setPower(Power);	// *7
+	frontRight.setPower(Power); 
+	backLeft.setPower(Power); //*7
+	backRight.setPower(Power);
+	sleep(time);
+	
+	frontLeft.setPower(0);  //stop
+	frontRight.setPower(0); 
+	backLeft.setPower(0);
+	backRight.setPower(0);
+		
+	}
+	*/
+	public void turn(double Power, int time){
+	frontLeft.setPower(Power);	
+	frontRight.setPower(-Power); //turn left
+	backLeft.setPower(Power);
+	backRight.setPower(-Power);
+	sleep(time);
+	
+	frontLeft.setPower(0);  //stop
+	frontRight.setPower(0); 
+	backLeft.setPower(0);
+	backRight.setPower(0);
+	
+}
+	public int encoderTicksPerInch(double dist) {
+		return (int) ((dist * 537.7) / (96 * 3.14));
+	}
+	
+	public void strafeEncoder(double power, int position){
+		frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		
+		frontRight.setTargetPosition(-1 * position);
+		frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		frontRight.setPower(power);
+		 
+		frontLeft.setTargetPosition(position);
+		frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		frontLeft.setPower(power);
+		 
+		backLeft.setTargetPosition(-1 * position);
+		backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		backLeft.setPower(power);
+		
+	   	backRight.setTargetPosition(position);
+		backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		backRight.setPower(power);
+		 
+		telemetry.addData("FrontRight", frontRight.getCurrentPosition());
+		telemetry.addData("Status", "Encoder");
+	}
+	public void forwardEncoder(double power, int position){
+		frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+		
+		frontRight.setTargetPosition(position);
+		frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		frontRight.setPower(power);
+		 
+		frontLeft.setTargetPosition(position);
+		frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		frontLeft.setPower(power);
+		 
+		backLeft.setTargetPosition(position);
+		backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		backLeft.setPower(power);
+		
+	   	backRight.setTargetPosition(position);
+		backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+		backRight.setPower(power);
+		 
+		telemetry.addData("FrontRight", frontRight.getCurrentPosition());
+		telemetry.addData("Status", "Encoder");
+	}
+}
+
+
